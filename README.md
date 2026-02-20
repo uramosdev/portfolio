@@ -180,7 +180,19 @@ Luego ejecuta `python seed.py` nuevamente para crear el nuevo usuario.
 
 ## 🔐 Uso del Panel Admin
 
-1. Navega a la sección **Admin** en el portafolio
+### Acceso Seguro
+
+**URL secreta del panel admin:**
+```
+http://localhost:3000/admin-panel-ubaldino-2025
+```
+(En producción: `https://tu-dominio.com/admin-panel-ubaldino-2025`)
+
+⚠️ **Importante:** El botón de Admin está oculto del sidebar público por seguridad. Solo tú conoces esta URL.
+
+### Pasos para acceder:
+
+1. Escribe la URL secreta directamente en tu navegador
 2. Inicia sesión con tus credenciales (por defecto: admin/admin123)
 3. Gestiona tus posts del blog:
    - ✅ Crear nuevos posts
@@ -189,6 +201,17 @@ Luego ejecuta `python seed.py` nuevamente para crear el nuevo usuario.
 4. Revisa mensajes de contacto:
    - 📬 Ver todos los mensajes recibidos
    - 🗑️ Eliminar mensajes leídos
+
+### Personalizar la URL secreta
+
+Para cambiar la URL a algo aún más personal:
+
+1. Abre `/app/frontend/src/App.js`
+2. Busca `admin-panel-ubaldino-2025`
+3. Cámbiala por tu URL preferida (ejemplo: `mi-super-admin-xyz`)
+4. Actualiza en 2 lugares:
+   - En el `case` del switch
+   - En el `useEffect` que sincroniza la ruta
 
 ## 📡 API Endpoints
 
