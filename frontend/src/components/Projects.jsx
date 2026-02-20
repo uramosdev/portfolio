@@ -1,8 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ExternalLink, Github } from 'lucide-react';
-import { projects } from '../mock/mockData';
+import { projects as mockProjects } from '../mock/mockData';
+import projectService from '../services/projectService';
 
 const Projects = () => {
+  const [projects, setProjects] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      setIsLoading(true);
+      const data = await projectService.getProjects();
+      setProjects(data);
+    } catch (err) {
+      console.error('Error fetching projects:', err);
+      setError('Error al cargar los proyectos');
+      // Fallback to mock data if API fails
+      setProjects(mockProjects);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <section className="min-h-screen bg-[#1a1a1a] py-20 px-6 flex items-center justify-center">
+        <div className="text-gray-400">Cargando proyectos...</div>
+      </section>
+    );
+  }
+
   return (
     <section className="min-h-screen bg-[#1a1a1a] py-20 px-6">
       <div className="max-w-7xl mx-auto">
