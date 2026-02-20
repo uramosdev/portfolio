@@ -1,37 +1,81 @@
-import React, { useState } from 'react';
-import { Plus, Edit2, Trash2, Save, X } from 'lucide-react';
-import { blogPosts as initialPosts } from '../mock/mockData';
+import React, { useState, useEffect } from 'react';
+import { Plus, Edit2, Trash2, Save, X, Mail } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import blogService from '../services/blogService';
+import contactService from '../services/contactService';
 
 const Admin = () => {
-  const [posts, setPosts] = useState(initialPosts);
+  const { isAuthenticated, login, logout } = useAuth();
+  const [posts, setPosts] = useState([]);
+  const [messages, setMessages] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [password, setPassword] = useState('');
   const [editingPost, setEditingPost] = useState(null);
+  const [activeTab, setActiveTab] = useState('posts'); // 'posts' or 'messages'
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Login state
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
+  
+  // Form state
   const [formData, setFormData] = useState({
     title: '',
     excerpt: '',
     content: '',
     category: '',
     tags: '',
-    image: ''
+    image: '',
+    readTime: '5 min'
   });
 
-  // Simple authentication (mock)
-  const handleLogin = (e) => {
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchPosts();
+      fetchMessages();
+    }
+  }, [isAuthenticated]);
+
+  const fetchPosts = async () => {
+    try {
+      const data = await blogService.getPosts();
+      setPosts(data);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    }
+  };
+
+  const fetchMessages = async () => {
+    try {
+      const data = await contactService.getMessages();
+      setMessages(data);
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    }
+  };
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (password === 'admin123') {
-      setIsAuthenticated(true);
+    setLoginError('');
+    setIsLoading(true);
+    
+    try {
+      await login(username, password);
+      setUsername('');
       setPassword('');
-    } else {
-      alert('Contraseña incorrecta');
+    } catch (error) {
+      setLoginError(typeof error === 'string' ? error : 'Credenciales incorrectas');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleLogout = () => {
-    setIsAuthenticated(false);
+    logout();
     setIsEditing(false);
     setEditingPost(null);
+    setPosts([]);
+    setMessages([]);
   };
 
   const handleChange = (e) => {
@@ -48,7 +92,8 @@ const Admin = () => {
       content: '',
       category: '',
       tags: '',
-      image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&h=400&fit=crop'
+      image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&h=400&fit=crop',
+      readTime: '5 min'
     });
   };
 
@@ -61,53 +106,68 @@ const Admin = () => {
       content: post.content,
       category: post.category,
       tags: post.tags.join(', '),
-      image: post.image
+      image: post.image,
+      readTime: post.readTime
     });
   };
 
-  const handleSavePost = (e) => {
+  const handleSavePost = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     
-    const postData = {
-      ...formData,
-      tags: formData.tags.split(',').map(tag => tag.trim()),
-      author: 'Ubaldino Ramos',
-      date: new Date().toISOString().split('T')[0],
-      readTime: '5 min'
-    };
-
-    if (editingPost) {
-      // Update existing post
-      setPosts(posts.map(post => 
-        post.id === editingPost ? { ...post, ...postData } : post
-      ));
-      alert('Post actualizado con éxito');
-    } else {
-      // Create new post
-      const newPost = {
-        id: posts.length + 1,
-        ...postData
+    try {
+      const postData = {
+        ...formData,
+        tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
       };
-      setPosts([newPost, ...posts]);
-      alert('Post creado con éxito');
-    }
 
-    setIsEditing(false);
-    setEditingPost(null);
-    setFormData({ title: '', excerpt: '', content: '', category: '', tags: '', image: '' });
+      if (editingPost) {
+        await blogService.updatePost(editingPost, postData);
+        alert('Post actualizado con éxito');
+      } else {
+        await blogService.createPost(postData);
+        alert('Post creado con éxito');
+      }
+
+      await fetchPosts();
+      setIsEditing(false);
+      setEditingPost(null);
+      setFormData({ title: '', excerpt: '', content: '', category: '', tags: '', image: '', readTime: '5 min' });
+    } catch (error) {
+      alert('Error al guardar el post: ' + (error.response?.data?.detail || error.message));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleDeletePost = (id) => {
+  const handleDeletePost = async (id) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar este post?')) {
-      setPosts(posts.filter(post => post.id !== id));
-      alert('Post eliminado');
+      try {
+        await blogService.deletePost(id);
+        await fetchPosts();
+        alert('Post eliminado');
+      } catch (error) {
+        alert('Error al eliminar el post');
+      }
+    }
+  };
+
+  const handleDeleteMessage = async (id) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar este mensaje?')) {
+      try {
+        await contactService.deleteMessage(id);
+        await fetchMessages();
+        alert('Mensaje eliminado');
+      } catch (error) {
+        alert('Error al eliminar el mensaje');
+      }
     }
   };
 
   const handleCancelEdit = () => {
     setIsEditing(false);
     setEditingPost(null);
-    setFormData({ title: '', excerpt: '', content: '', category: '', tags: '', image: '' });
+    setFormData({ title: '', excerpt: '', content: '', category: '', tags: '', image: '', readTime: '5 min' });
   };
 
   // Login Screen
@@ -118,6 +178,20 @@ const Admin = () => {
           <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-8">
             <h2 className="text-4xl font-bold text-white mb-6 text-center">Admin Login</h2>
             <form onSubmit={handleLogin} className="space-y-6">
+              <div>
+                <label htmlFor="username" className="block text-white font-semibold mb-2">
+                  Usuario
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                  placeholder="Ingresa tu usuario"
+                />
+              </div>
               <div>
                 <label htmlFor="password" className="block text-white font-semibold mb-2">
                   Contraseña
@@ -132,14 +206,20 @@ const Admin = () => {
                   placeholder="Ingresa la contraseña"
                 />
               </div>
+              {loginError && (
+                <div className="p-3 bg-red-500/10 border border-red-500/50 rounded-lg text-red-500 text-sm">
+                  {loginError}
+                </div>
+              )}
               <button
                 type="submit"
-                className="w-full px-6 py-3 bg-emerald-500 text-black font-semibold rounded-lg hover:bg-emerald-400 transition-colors"
+                disabled={isLoading}
+                className="w-full px-6 py-3 bg-emerald-500 text-black font-semibold rounded-lg hover:bg-emerald-400 transition-colors disabled:opacity-50"
               >
-                Iniciar sesión
+                {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
               </button>
               <p className="text-gray-400 text-sm text-center">
-                Demo: usar "admin123"
+                Credenciales por defecto: admin / admin123
               </p>
             </form>
           </div>
@@ -217,16 +297,29 @@ const Admin = () => {
               </div>
 
               <div>
-                <label className="block text-white font-semibold mb-2">Tags (separados por comas)</label>
+                <label className="block text-white font-semibold mb-2">Tiempo de lectura</label>
                 <input
                   type="text"
-                  name="tags"
-                  value={formData.tags}
+                  name="readTime"
+                  value={formData.readTime}
                   onChange={handleChange}
                   required
                   className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg text-white focus:border-emerald-500 focus:outline-none transition-colors"
+                  placeholder="5 min"
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="block text-white font-semibold mb-2">Tags (separados por comas)</label>
+              <input
+                type="text"
+                name="tags"
+                value={formData.tags}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg text-white focus:border-emerald-500 focus:outline-none transition-colors"
+              />
             </div>
 
             <div>
@@ -243,10 +336,11 @@ const Admin = () => {
 
             <button
               type="submit"
-              className="w-full px-6 py-4 bg-emerald-500 text-black font-semibold rounded-lg hover:bg-emerald-400 transition-colors flex items-center justify-center gap-2"
+              disabled={isLoading}
+              className="w-full px-6 py-4 bg-emerald-500 text-black font-semibold rounded-lg hover:bg-emerald-400 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
             >
               <Save size={20} />
-              Guardar Post
+              {isLoading ? 'Guardando...' : 'Guardar Post'}
             </button>
           </form>
         </div>
@@ -265,13 +359,15 @@ const Admin = () => {
             <div className="h-1 w-24 bg-emerald-500"></div>
           </div>
           <div className="flex gap-4">
-            <button
-              onClick={handleNewPost}
-              className="px-6 py-3 bg-emerald-500 text-black font-semibold rounded-lg hover:bg-emerald-400 transition-colors flex items-center gap-2"
-            >
-              <Plus size={20} />
-              Nuevo Post
-            </button>
+            {activeTab === 'posts' && (
+              <button
+                onClick={handleNewPost}
+                className="px-6 py-3 bg-emerald-500 text-black font-semibold rounded-lg hover:bg-emerald-400 transition-colors flex items-center gap-2"
+              >
+                <Plus size={20} />
+                Nuevo Post
+              </button>
+            )}
             <button
               onClick={handleLogout}
               className="px-6 py-3 bg-[#1a1a1a] text-gray-400 rounded-lg hover:bg-[#2a2a2a] transition-colors"
@@ -281,43 +377,120 @@ const Admin = () => {
           </div>
         </div>
 
+        {/* Tabs */}
+        <div className="flex gap-4 mb-8">
+          <button
+            onClick={() => setActiveTab('posts')}
+            className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
+              activeTab === 'posts'
+                ? 'bg-emerald-500 text-black'
+                : 'bg-[#1a1a1a] text-gray-400 hover:bg-[#2a2a2a]'
+            }`}
+          >
+            Posts del Blog
+          </button>
+          <button
+            onClick={() => setActiveTab('messages')}
+            className={`px-6 py-3 rounded-lg font-semibold transition-colors flex items-center gap-2 ${
+              activeTab === 'messages'
+                ? 'bg-emerald-500 text-black'
+                : 'bg-[#1a1a1a] text-gray-400 hover:bg-[#2a2a2a]'
+            }`}
+          >
+            <Mail size={20} />
+            Mensajes ({messages.length})
+          </button>
+        </div>
+
         {/* Posts List */}
-        <div className="space-y-4">
-          {posts.map((post) => (
-            <div
-              key={post.id}
-              className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6 hover:border-emerald-500/50 transition-all"
-            >
-              <div className="flex items-start justify-between gap-6">
-                <div className="flex-1">
-                  <h3 className="text-2xl font-bold text-white mb-2">{post.title}</h3>
-                  <p className="text-gray-400 mb-3">{post.excerpt}</p>
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <span>{post.category}</span>
-                    <span>•</span>
-                    <span>{new Date(post.date).toLocaleDateString('es-ES')}</span>
-                    <span>•</span>
-                    <span>{post.readTime}</span>
+        {activeTab === 'posts' && (
+          <div className="space-y-4">
+            {posts.length === 0 ? (
+              <div className="text-center text-gray-400 py-12">
+                No hay posts todavía. ¡Crea el primero!
+              </div>
+            ) : (
+              posts.map((post) => (
+                <div
+                  key={post.id}
+                  className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6 hover:border-emerald-500/50 transition-all"
+                >
+                  <div className="flex items-start justify-between gap-6">
+                    <div className="flex-1">
+                      <h3 className="text-2xl font-bold text-white mb-2">{post.title}</h3>
+                      <p className="text-gray-400 mb-3">{post.excerpt}</p>
+                      <div className="flex items-center gap-4 text-sm text-gray-500">
+                        <span>{post.category}</span>
+                        <span>•</span>
+                        <span>{new Date(post.date).toLocaleDateString('es-ES')}</span>
+                        <span>•</span>
+                        <span>{post.readTime}</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEditPost(post)}
+                        className="w-10 h-10 bg-[#2a2a2a] rounded-lg flex items-center justify-center text-emerald-500 hover:bg-emerald-500/10 transition-colors"
+                      >
+                        <Edit2 size={18} />
+                      </button>
+                      <button
+                        onClick={() => handleDeletePost(post.id)}
+                        className="w-10 h-10 bg-[#2a2a2a] rounded-lg flex items-center justify-center text-red-500 hover:bg-red-500/10 transition-colors"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleEditPost(post)}
-                    className="w-10 h-10 bg-[#2a2a2a] rounded-lg flex items-center justify-center text-emerald-500 hover:bg-emerald-500/10 transition-colors"
-                  >
-                    <Edit2 size={18} />
-                  </button>
-                  <button
-                    onClick={() => handleDeletePost(post.id)}
-                    className="w-10 h-10 bg-[#2a2a2a] rounded-lg flex items-center justify-center text-red-500 hover:bg-red-500/10 transition-colors"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {/* Messages List */}
+        {activeTab === 'messages' && (
+          <div className="space-y-4">
+            {messages.length === 0 ? (
+              <div className="text-center text-gray-400 py-12">
+                No hay mensajes todavía.
               </div>
-            </div>
-          ))}
-        </div>
+            ) : (
+              messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6 hover:border-emerald-500/50 transition-all"
+                >
+                  <div className="flex items-start justify-between gap-6">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-xl font-bold text-white">{msg.name}</h3>
+                        <span className="text-emerald-500 text-sm">{msg.email}</span>
+                      </div>
+                      <h4 className="text-lg text-gray-300 mb-2">{msg.subject}</h4>
+                      <p className="text-gray-400 mb-3">{msg.message}</p>
+                      <div className="text-sm text-gray-500">
+                        {new Date(msg.date).toLocaleDateString('es-ES', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteMessage(msg.id)}
+                      className="w-10 h-10 bg-[#2a2a2a] rounded-lg flex items-center justify-center text-red-500 hover:bg-red-500/10 transition-colors"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
       </div>
     </section>
   );
