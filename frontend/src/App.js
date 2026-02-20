@@ -37,6 +37,7 @@ const pageVariants = {
 
 function AppContent() {
   const [activeSection, setActiveSection] = useState('home');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -79,8 +80,16 @@ function AppContent() {
 
   return (
     <div className="App bg-[#0a0a0a] min-h-screen">
-      <Sidebar activeSection={activeSection} setActiveSection={setActiveSection} />
-      <main className="lg:ml-64">
+      <Sidebar 
+        activeSection={activeSection} 
+        setActiveSection={setActiveSection}
+        onCollapseChange={setIsSidebarCollapsed}
+      />
+      <motion.main
+        animate={{ marginLeft: isSidebarCollapsed ? 80 : 256 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        className="lg:ml-64"
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={activeSection}
@@ -92,7 +101,7 @@ function AppContent() {
             {renderSection()}
           </motion.div>
         </AnimatePresence>
-      </main>
+      </motion.main>
     </div>
   );
 }
