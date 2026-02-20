@@ -24,12 +24,20 @@ function App() {
         return <Blog />;
       case 'contact':
         return <Contact />;
-      case 'admin':
+      case 'admin-panel-ubaldino-2025':
         return <Admin />;
       default:
         return <Home />;
     }
   };
+
+  // Allow direct URL access to admin
+  React.useEffect(() => {
+    const path = window.location.pathname;
+    if (path === '/admin-panel-ubaldino-2025') {
+      setActiveSection('admin-panel-ubaldino-2025');
+    }
+  }, []);
 
   return (
     <AuthProvider>
