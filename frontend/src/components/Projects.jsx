@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ExternalLink, Github } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { projects as mockProjects } from '../mock/mockData';
 import projectService from '../services/projectService';
 
@@ -27,6 +28,28 @@ const Projects = () => {
     }
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: 'easeOut'
+      }
+    }
+  };
+
   if (isLoading) {
     return (
       <section className="min-h-screen bg-[#1a1a1a] py-20 px-6 flex items-center justify-center">
@@ -39,10 +62,20 @@ const Projects = () => {
     <section className="min-h-screen bg-[#1a1a1a] py-20 px-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="mb-16"
+        >
           <h2 className="text-6xl md:text-7xl font-bold text-white mb-4">mis proyectos</h2>
-          <div className="h-1 w-24 bg-emerald-500"></div>
-        </div>
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: 96 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="h-1 bg-emerald-500"
+          ></motion.div>
+        </motion.div>
 
         {/* Error Message */}
         {error && (
@@ -52,36 +85,49 @@ const Projects = () => {
         )}
 
         {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {projects.map((project) => (
-            <div
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
+          {projects.map((project, index) => (
+            <motion.div
               key={project.id}
+              variants={cardVariants}
+              whileHover={{ y: -10 }}
               className="bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl overflow-hidden hover:border-emerald-500/50 transition-all group"
             >
               {/* Project Image */}
               <div className="relative overflow-hidden aspect-video">
-                <img
+                <motion.img
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ duration: 0.4 }}
                   src={project.image}
                   alt={project.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
-                  <a
+                  <motion.a
                     href={project.liveUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                     className="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center hover:bg-emerald-400 transition-colors"
                   >
                     <ExternalLink size={20} className="text-black" />
-                  </a>
-                  <a
+                  </motion.a>
+                  <motion.a
                     href={project.githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                     className="w-12 h-12 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"
                   >
                     <Github size={20} className="text-black" />
-                  </a>
+                  </motion.a>
                 </div>
               </div>
 
@@ -93,18 +139,21 @@ const Projects = () => {
                 {/* Technologies */}
                 <div className="flex flex-wrap gap-2">
                   {project.technologies.map((tech, index) => (
-                    <span
+                    <motion.span
                       key={index}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.05 }}
                       className="px-3 py-1 bg-[#2a2a2a] text-emerald-500 text-xs rounded-full"
                     >
                       {tech}
-                    </span>
+                    </motion.span>
                   ))}
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
