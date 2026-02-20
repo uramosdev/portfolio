@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Home, User, Briefcase, FileText, Mail, Menu, X } from 'lucide-react';
+import { Home, User, Briefcase, FileText, Mail, Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Sidebar = ({ activeSection, setActiveSection }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false); // Estado para desktop
 
   const menuItems = [
     { id: 'home', icon: Home, label: 'Inicio' },
@@ -52,16 +53,100 @@ const Sidebar = ({ activeSection, setActiveSection }) => {
         </AnimatePresence>
       </motion.button>
 
-      {/* Sidebar Desktop (expanded with labels) */}
-      <aside className="hidden lg:block fixed left-0 top-0 h-screen bg-[#0a0a0a] border-r border-[#2a2a2a] z-40 w-64">
-        {/* Header - Sin contenido */}
-        <div className="h-20 border-b border-[#2a2a2a]"></div>
+      {/* Sidebar Desktop (collapsible) */}
+      <motion.aside
+        animate={{ width: isCollapsed ? 80 : 256 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        className="hidden lg:block fixed left-0 top-0 h-screen bg-[#0a0a0a] border-r border-[#2a2a2a] z-40"
+      >
+        {/* Header con botón toggle */}
+        <div className="h-20 border-b border-[#2a2a2a] flex items-center justify-end px-4">
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="w-10 h-10 rounded-lg bg-[#1a1a1a] hover:bg-emerald-500/10 text-gray-400 hover:text-emerald-500 flex items-center justify-center transition-colors"
+          >
+            <AnimatePresence mode="wait">
+              {isCollapsed ? (
+                <motion.div
+                  key="expand"
+                  initial={{ rotate: -180, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 180, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <ChevronRight size={20} />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="collapse"
+                  initial={{ rotate: 180, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: -180, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <ChevronLeft size={20} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.button>
+        </div>
 
-        {/* Navigation Items Desktop con Labels */}
-        <nav className="flex flex-col px-4 py-8 space-y-4">
+        {/* Navigation Items Desktop */}
+        <nav className={`flex flex-col py-8 ${isCollapsed ? 'items-center space-y-8 px-0' : 'px-4 space-y-4'}`}>
           {menuItems.map((item, index) => {
             const Icon = item.icon;
             const isActive = activeSection === item.id;
+            
+            if (isCollapsed) {
+              // Vista colapsada (solo iconos)
+              return (
+                <motion.button
+                  key={item.id}
+                  onClick={() => handleNavClick(item.id)}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ scale: 1.1, x: 5 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`relative w-12 h-12 flex items-center justify-center rounded-lg transition-all group ${
+                    isActive
+                      ? 'bg-emerald-500 text-black'
+                      : 'text-gray-400 hover:text-emerald-500 hover:bg-[#1a1a1a]'
+                  }`}
+                  title={item.label}
+                >
+                  <motion.div
+                    animate={isActive ? { scale: [1, 1.2, 1] } : {}}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Icon size={20} />
+                  </motion.div>
+                  
+                  {/* Tooltip cuando está colapsado */}
+                  <motion.span
+                    initial={{ opacity: 0, x: -10 }}
+                    whileHover={{ opacity: 1, x: 0 }}
+                    className="absolute left-full ml-4 px-3 py-1.5 bg-emerald-500 text-black text-sm font-semibold rounded-lg whitespace-nowrap pointer-events-none shadow-lg z-50"
+                  >
+                    {item.label}
+                  </motion.span>
+
+                  {/* Active indicator */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeDesktopIndicatorCollapsed"
+                      className="absolute left-0 w-1 h-8 bg-emerald-500 rounded-r-full"
+                      initial={false}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    />
+                  )}
+                </motion.button>
+              );
+            }
+            
+            // Vista expandida (iconos + labels)
             return (
               <motion.button
                 key={item.id}
@@ -78,14 +163,19 @@ const Sidebar = ({ activeSection, setActiveSection }) => {
                 }`}
               >
                 <Icon size={22} className={isActive ? 'text-black' : ''} />
-                <span className={`text-base font-semibold ${isActive ? 'text-black' : ''}`}>
+                <motion.span
+                  initial={{ opacity: 0, width: 0 }}
+                  animate={{ opacity: 1, width: 'auto' }}
+                  exit={{ opacity: 0, width: 0 }}
+                  className={`text-base font-semibold whitespace-nowrap ${isActive ? 'text-black' : ''}`}
+                >
                   {item.label}
-                </span>
+                </motion.span>
                 
                 {/* Active indicator */}
                 {isActive && (
                   <motion.div
-                    layoutId="activeDesktopIndicator"
+                    layoutId="activeDesktopIndicatorExpanded"
                     className="ml-auto w-2 h-2 bg-black rounded-full"
                     initial={false}
                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
@@ -97,19 +187,22 @@ const Sidebar = ({ activeSection, setActiveSection }) => {
         </nav>
 
         {/* Footer info Desktop */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="absolute bottom-8 left-0 right-0 px-6"
-        >
-          <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-4">
-            <p className="text-gray-400 text-xs text-center">
-              Portfolio © 2025
-            </p>
-          </div>
-        </motion.div>
-      </aside>
+        {!isCollapsed && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ delay: 0.5 }}
+            className="absolute bottom-8 left-0 right-0 px-6"
+          >
+            <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-4">
+              <p className="text-gray-400 text-xs text-center">
+                Portfolio © 2025
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </motion.aside>
 
       {/* Sidebar Mobile (expanded with labels) */}
       <AnimatePresence>
