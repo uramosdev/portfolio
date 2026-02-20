@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Home, User, Briefcase, FileText, Mail, Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const Sidebar = ({ activeSection, setActiveSection }) => {
+const Sidebar = ({ activeSection, setActiveSection, onCollapseChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false); // Estado para desktop
 
@@ -17,6 +17,14 @@ const Sidebar = ({ activeSection, setActiveSection }) => {
   const handleNavClick = (sectionId) => {
     setActiveSection(sectionId);
     setIsOpen(false);
+  };
+
+  const toggleCollapse = () => {
+    const newState = !isCollapsed;
+    setIsCollapsed(newState);
+    if (onCollapseChange) {
+      onCollapseChange(newState);
+    }
   };
 
   return (
