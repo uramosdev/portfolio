@@ -131,16 +131,8 @@ const Sidebar = ({ activeSection, setActiveSection }) => {
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
               className="lg:hidden fixed left-0 top-0 h-screen bg-[#0a0a0a] border-r border-emerald-500 z-40 w-64 shadow-2xl"
             >
-              {/* Header - Sin logo de fondo */}
-              <div className="h-20 flex items-center justify-between px-6 border-b border-[#2a2a2a]">
-                <motion.h2
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="text-emerald-500 text-xl font-bold"
-                >
-                  Menú
-                </motion.h2>
-              </div>
+              {/* Header - Sin contenido */}
+              <div className="h-20 border-b border-[#2a2a2a]"></div>
 
               {/* Navigation Items Mobile con Labels */}
               <nav className="flex flex-col px-4 py-8 space-y-4">
