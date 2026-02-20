@@ -52,21 +52,13 @@ const Sidebar = ({ activeSection, setActiveSection }) => {
         </AnimatePresence>
       </motion.button>
 
-      {/* Sidebar Desktop (collapsed) */}
-      <aside className="hidden lg:block fixed left-0 top-0 h-screen bg-[#0a0a0a] border-r border-[#2a2a2a] z-40 w-20">
-        {/* Logo */}
-        <div className="h-20 flex items-center justify-center border-b border-[#2a2a2a]">
-          <motion.div
-            whileHover={{ rotate: 180 }}
-            transition={{ duration: 0.3 }}
-            className="w-12 h-12 bg-emerald-500 rounded-lg flex items-center justify-center"
-          >
-            <Menu size={24} className="text-black" />
-          </motion.div>
-        </div>
+      {/* Sidebar Desktop (expanded with labels) */}
+      <aside className="hidden lg:block fixed left-0 top-0 h-screen bg-[#0a0a0a] border-r border-[#2a2a2a] z-40 w-64">
+        {/* Header - Sin contenido */}
+        <div className="h-20 border-b border-[#2a2a2a]"></div>
 
-        {/* Navigation Items Desktop */}
-        <nav className="flex flex-col items-center py-8 space-y-8">
+        {/* Navigation Items Desktop con Labels */}
+        <nav className="flex flex-col px-4 py-8 space-y-4">
           {menuItems.map((item, index) => {
             const Icon = item.icon;
             const isActive = activeSection === item.id;
@@ -77,39 +69,24 @@ const Sidebar = ({ activeSection, setActiveSection }) => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1 }}
-                whileHover={{ 
-                  scale: 1.1,
-                  x: 5
-                }}
-                whileTap={{ scale: 0.95 }}
-                className={`relative w-12 h-12 flex items-center justify-center rounded-lg transition-all group ${
+                whileHover={{ scale: 1.03, x: 5 }}
+                whileTap={{ scale: 0.97 }}
+                className={`flex items-center gap-4 px-4 py-4 rounded-lg transition-all ${
                   isActive
-                    ? 'bg-emerald-500 text-black'
+                    ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/50'
                     : 'text-gray-400 hover:text-emerald-500 hover:bg-[#1a1a1a]'
                 }`}
-                title={item.label}
               >
-                <motion.div
-                  animate={isActive ? { scale: [1, 1.2, 1] } : {}}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Icon size={20} />
-                </motion.div>
-                
-                {/* Tooltip Desktop Only */}
-                <motion.span
-                  initial={{ opacity: 0, x: -10 }}
-                  whileHover={{ opacity: 1, x: 0 }}
-                  className="absolute left-full ml-4 px-3 py-1.5 bg-emerald-500 text-black text-sm font-semibold rounded-lg whitespace-nowrap pointer-events-none shadow-lg"
-                >
+                <Icon size={22} className={isActive ? 'text-black' : ''} />
+                <span className={`text-base font-semibold ${isActive ? 'text-black' : ''}`}>
                   {item.label}
-                </motion.span>
-
+                </span>
+                
                 {/* Active indicator */}
                 {isActive && (
                   <motion.div
-                    layoutId="activeIndicator"
-                    className="absolute left-0 w-1 h-8 bg-emerald-500 rounded-r-full"
+                    layoutId="activeDesktopIndicator"
+                    className="ml-auto w-2 h-2 bg-black rounded-full"
                     initial={false}
                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
                   />
@@ -118,6 +95,20 @@ const Sidebar = ({ activeSection, setActiveSection }) => {
             );
           })}
         </nav>
+
+        {/* Footer info Desktop */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="absolute bottom-8 left-0 right-0 px-6"
+        >
+          <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-4">
+            <p className="text-gray-400 text-xs text-center">
+              Portfolio © 2025
+            </p>
+          </div>
+        </motion.div>
       </aside>
 
       {/* Sidebar Mobile (expanded with labels) */}
