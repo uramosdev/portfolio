@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from './components/Sidebar';
 import Home from './components/Home';
 import About from './components/About';
@@ -9,6 +10,30 @@ import Blog from './components/Blog';
 import Contact from './components/Contact';
 import Admin from './components/Admin';
 import { AuthProvider } from './context/AuthContext';
+
+// Page transition variants
+const pageVariants = {
+  initial: {
+    opacity: 0,
+    x: -20
+  },
+  animate: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.4,
+      ease: 'easeOut'
+    }
+  },
+  exit: {
+    opacity: 0,
+    x: 20,
+    transition: {
+      duration: 0.3,
+      ease: 'easeIn'
+    }
+  }
+};
 
 function AppContent() {
   const [activeSection, setActiveSection] = useState('home');
@@ -56,7 +81,17 @@ function AppContent() {
     <div className="App bg-[#0a0a0a] min-h-screen">
       <Sidebar activeSection={activeSection} setActiveSection={setActiveSection} />
       <main className="lg:ml-20">
-        {renderSection()}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeSection}
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+          >
+            {renderSection()}
+          </motion.div>
+        </AnimatePresence>
       </main>
     </div>
   );
