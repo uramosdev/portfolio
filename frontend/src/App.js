@@ -18,8 +18,8 @@ function AppContent() {
   useEffect(() => {
     // Sync activeSection with current route
     const path = location.pathname;
-    if (path === '/admin-panel-ubaldino-2025') {
-      setActiveSection('admin-panel-ubaldino-2025');
+    if (path === '/admin-unchain') {
+      setActiveSection('admin-unchain');
     } else if (path === '/about') {
       setActiveSection('about');
     } else if (path === '/projects') {
@@ -45,7 +45,7 @@ function AppContent() {
         return <Blog />;
       case 'contact':
         return <Contact />;
-      case 'admin-panel-ubaldino-2025':
+      case 'admin-unchain':
         return <Admin />;
       default:
         return <Home />;
