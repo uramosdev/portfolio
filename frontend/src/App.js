@@ -79,7 +79,7 @@ function AppContent() {
   };
 
   return (
-    <div className="App bg-[#0a0a0a] min-h-screen">
+    <div className="App bg-[#0a0a0a] min-h-screen flex">
       <Sidebar 
         activeSection={activeSection} 
         setActiveSection={setActiveSection}
@@ -87,25 +87,23 @@ function AppContent() {
       />
       <motion.main
         animate={{ 
-          marginLeft: isSidebarCollapsed ? 80 : 256,
+          marginLeft: window.innerWidth >= 1024 ? (isSidebarCollapsed ? 80 : 256) : 0,
         }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className="min-h-screen"
-        style={{ marginLeft: 0 }}
+        className="flex-1 w-full"
       >
-        <div className="lg:ml-0">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeSection}
-              variants={pageVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-            >
-              {renderSection()}
-            </motion.div>
-          </AnimatePresence>
-        </div>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeSection}
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="w-full"
+          >
+            {renderSection()}
+          </motion.div>
+        </AnimatePresence>
       </motion.main>
     </div>
   );
