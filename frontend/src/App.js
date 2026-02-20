@@ -80,7 +80,7 @@ function AppContent() {
   return (
     <div className="App bg-[#0a0a0a] min-h-screen">
       <Sidebar activeSection={activeSection} setActiveSection={setActiveSection} />
-      <main className="lg:ml-20">
+      <main className="lg:ml-64">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeSection}
