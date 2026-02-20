@@ -72,7 +72,7 @@ const Sidebar = ({ activeSection, setActiveSection, onCollapseChange }) => {
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={() => setIsCollapsed(!isCollapsed)}
+            onClick={toggleCollapse}
             className="w-10 h-10 rounded-lg bg-[#1a1a1a] hover:bg-emerald-500/10 text-gray-400 hover:text-emerald-500 flex items-center justify-center transition-colors"
           >
             <AnimatePresence mode="wait">
