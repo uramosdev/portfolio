@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
 import { personalInfo } from '../mock/mockData';
+import contactService from '../services/contactService';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -11,26 +12,35 @@ const Contact = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
+  const [submitError, setSubmitError] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitMessage('');
+    setSubmitError('');
     
-    // Mock submission
-    setTimeout(() => {
+    try {
+      await contactService.sendMessage(formData);
       setSubmitMessage('¡Mensaje enviado con éxito! Te contactaré pronto.');
-      setIsSubmitting(false);
       setFormData({ name: '', email: '', subject: '', message: '' });
       
       setTimeout(() => {
         setSubmitMessage('');
       }, 5000);
-    }, 1500);
+    } catch (error) {
+      setSubmitError('Error al enviar el mensaje. Por favor, intenta de nuevo.');
+      setTimeout(() => {
+        setSubmitError('');
+      }, 5000);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
