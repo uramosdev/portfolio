@@ -86,21 +86,26 @@ function AppContent() {
         onCollapseChange={setIsSidebarCollapsed}
       />
       <motion.main
-        animate={{ marginLeft: isSidebarCollapsed ? 80 : 256 }}
+        animate={{ 
+          marginLeft: isSidebarCollapsed ? 80 : 256,
+        }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className="lg:ml-64"
+        className="min-h-screen"
+        style={{ marginLeft: 0 }}
       >
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeSection}
-            variants={pageVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-          >
-            {renderSection()}
-          </motion.div>
-        </AnimatePresence>
+        <div className="lg:ml-0">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeSection}
+              variants={pageVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+            >
+              {renderSection()}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </motion.main>
     </div>
   );
