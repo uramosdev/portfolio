@@ -1,8 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, Tag } from 'lucide-react';
-import { blogPosts } from '../mock/mockData';
+import { blogPosts as mockPosts } from '../mock/mockData';
+import blogService from '../services/blogService';
 
 const Blog = () => {
+  const [posts, setPosts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const fetchPosts = async () => {
+    try {
+      setIsLoading(true);
+      const data = await blogService.getPosts();
+      setPosts(data);
+    } catch (err) {
+      console.error('Error fetching posts:', err);
+      setError('Error al cargar los posts');
+      // Fallback to mock data if API fails
+      setPosts(mockPosts);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <section className="min-h-screen bg-[#0a0a0a] py-20 px-6 flex items-center justify-center">
+        <div className="text-gray-400">Cargando posts...</div>
+      </section>
+    );
+  }
+
   return (
     <section className="min-h-screen bg-[#0a0a0a] py-20 px-6">
       <div className="max-w-7xl mx-auto">
