@@ -44,6 +44,13 @@ const Projects = () => {
           <div className="h-1 w-24 bg-emerald-500"></div>
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <div className="mb-8 p-4 bg-red-500/10 border border-red-500/50 rounded-lg text-red-500">
+            {error}
+          </div>
+        )}
+
         {/* Projects Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {projects.map((project) => (
