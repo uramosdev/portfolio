@@ -184,6 +184,12 @@ const Contact = () => {
                   {submitMessage}
                 </div>
               )}
+
+              {submitError && (
+                <div className="p-4 bg-red-500/10 border border-red-500/50 rounded-lg text-red-500 text-center">
+                  {submitError}
+                </div>
+              )}
             </form>
           </div>
         </div>
