@@ -184,16 +184,20 @@ Luego ejecuta `python seed.py` nuevamente para crear el nuevo usuario.
 
 **URL secreta del panel admin:**
 ```
-http://localhost:3000/admin-panel-ubaldino-2025
+http://localhost:3000/admin-unchain
 ```
-(En producción: `https://tu-dominio.com/admin-panel-ubaldino-2025`)
+(En producción: `https://tu-dominio.com/admin-unchain`)
 
 ⚠️ **Importante:** El botón de Admin está oculto del sidebar público por seguridad. Solo tú conoces esta URL.
+
+### Credenciales de Acceso:
+- **Usuario:** `lordCi4`
+- **Contraseña:** `morningStar`
 
 ### Pasos para acceder:
 
 1. Escribe la URL secreta directamente en tu navegador
-2. Inicia sesión con tus credenciales (por defecto: admin/admin123)
+2. Inicia sesión con tus credenciales
 3. Gestiona tus posts del blog:
    - ✅ Crear nuevos posts
    - ✏️ Editar posts existentes
@@ -207,11 +211,20 @@ http://localhost:3000/admin-panel-ubaldino-2025
 Para cambiar la URL a algo aún más personal:
 
 1. Abre `/app/frontend/src/App.js`
-2. Busca `admin-panel-ubaldino-2025`
+2. Busca `admin-unchain`
 3. Cámbiala por tu URL preferida (ejemplo: `mi-super-admin-xyz`)
 4. Actualiza en 2 lugares:
    - En el `case` del switch
    - En el `useEffect` que sincroniza la ruta
+
+### Cambiar Credenciales
+
+1. Edita `/app/backend/.env`:
+   ```
+   ADMIN_USERNAME=tu_nuevo_usuario
+   ADMIN_PASSWORD=tu_nueva_contraseña
+   ```
+2. Ejecuta: `cd /app/backend && python seed.py`
 
 ## 📡 API Endpoints
 
