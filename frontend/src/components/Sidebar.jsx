@@ -9,8 +9,8 @@ const Sidebar = ({ activeSection, setActiveSection }) => {
     { id: 'about', icon: User, label: 'Sobre mí' },
     { id: 'projects', icon: Briefcase, label: 'Proyectos' },
     { id: 'blog', icon: FileText, label: 'Blog' },
-    { id: 'contact', icon: Mail, label: 'Contacto' },
-    { id: 'admin', icon: Settings, label: 'Admin' }
+    { id: 'contact', icon: Mail, label: 'Contacto' }
+    // Admin route hidden - access directly via URL
   ];
 
   const handleNavClick = (sectionId) => {
