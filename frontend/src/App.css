@@ -26,8 +26,55 @@ body {
 ::-webkit-scrollbar-thumb {
     background: #2a2a2a;
     border-radius: 5px;
+    transition: background 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
     background: #4ade80;
+}
+
+/* Button animations */
+button {
+    position: relative;
+    overflow: hidden;
+}
+
+button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+button:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Smooth transitions for all interactive elements */
+a, button, input, textarea {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Card hover glow effect */
+.group:hover {
+    box-shadow: 0 0 30px rgba(74, 222, 128, 0.15);
+}
+
+/* Text selection */
+::selection {
+    background-color: #4ade80;
+    color: #000000;
+}
+
+/* Prevent layout shift */
+* {
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
 }
