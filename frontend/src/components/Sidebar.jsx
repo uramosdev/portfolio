@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const Sidebar = ({ activeSection, setActiveSection, onCollapseChange }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false); // Estado para desktop
+  const [isCollapsed, setIsCollapsed] = useState(true); // Estado para desktop - cerrado por defecto
 
   const menuItems = [
     { id: 'home', icon: Home, label: 'Inicio' },

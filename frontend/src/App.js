@@ -37,7 +37,7 @@ const pageVariants = {
 
 function AppContent() {
   const [activeSection, setActiveSection] = useState('home');
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
 
