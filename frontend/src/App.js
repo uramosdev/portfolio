@@ -7,6 +7,7 @@ import Projects from './components/Projects';
 import Blog from './components/Blog';
 import Contact from './components/Contact';
 import Admin from './components/Admin';
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
   const [activeSection, setActiveSection] = useState('home');
@@ -31,12 +32,14 @@ function App() {
   };
 
   return (
-    <div className="App bg-[#0a0a0a] min-h-screen">
-      <Sidebar activeSection={activeSection} setActiveSection={setActiveSection} />
-      <main className="lg:ml-20">
-        {renderSection()}
-      </main>
-    </div>
+    <AuthProvider>
+      <div className="App bg-[#0a0a0a] min-h-screen">
+        <Sidebar activeSection={activeSection} setActiveSection={setActiveSection} />
+        <main className="lg:ml-20">
+          {renderSection()}
+        </main>
+      </div>
+    </AuthProvider>
   );
 }
 
