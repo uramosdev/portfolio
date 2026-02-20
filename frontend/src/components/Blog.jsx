@@ -44,9 +44,16 @@ const Blog = () => {
           <div className="h-1 w-24 bg-emerald-500"></div>
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <div className="mb-8 p-4 bg-red-500/10 border border-red-500/50 rounded-lg text-red-500">
+            {error}
+          </div>
+        )}
+
         {/* Blog Posts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {blogPosts.map((post) => (
+          {posts.map((post) => (
             <article
               key={post.id}
               className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl overflow-hidden hover:border-emerald-500/50 transition-all group"
