@@ -1,0 +1,5 @@
+{
+  "name": "ProPortfolio - Clean Architecture Developer Portfolio",
+  "description": "A high-end, full-stack professional portfolio for developers featuring Clean Architecture, JWT authentication, a complete blog with Markdown support, and an administrative dashboard.",
+  "requestFramePermissions": []
+}
