@@ -22,7 +22,7 @@ export default defineConfig(({mode}) => {
       // Do not modifyâfile watching is disabled to prevent flickering during agent edits.
       hmr: process.env.DISABLE_HMR !== 'true',
       allowedHosts: [
-      'reniform-danette-mixolydian.ngrok-free.dev'
+      'uramosdev.up.railway.app'
     ],
     },
   };
