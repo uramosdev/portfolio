@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import db from '../infrastructure/db.ts';
-import { User } from '../domain/entities';
+import { User } from '../domain/entities.js';
 
 export interface IUserRepository {
   findByEmail(email: string): Promise<User | null>;
