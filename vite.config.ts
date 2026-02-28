@@ -18,12 +18,16 @@ export default defineConfig(({mode}) => {
       },
     },
     server: {
-      // HMR is disabled in AI Studio via DISABLE_HMR env var.
-      // Do not modifyâfile watching is disabled to prevent flickering during agent edits.
-      hmr: process.env.DISABLE_HMR !== 'true',
-      allowedHosts: [
-      'uramosdev.up.railway.app'
-    ],
-    },
+      hmr: {
+        // Forzamos a que el cliente se conecte a la URL de Railway en el puerto estándar
+        clientPort: 443, 
+        host: 'uramosdev.up.railway.app', // Tu dominio de Railway
+        protocol: 'wss',
+      },
+      // Asegúrate de que el servidor escuche en 0.0.0.0
+    host: true,
+    port: parseInt(process.env.PORT || '5173'),
+  },
+
   };
 });
