@@ -17,17 +17,22 @@ export default defineConfig(({mode}) => {
         '@': path.resolve(__dirname, '.'),
       },
     },
-    server: {
-      hmr: {
-        // Forzamos a que el cliente se conecte a la URL de Railway en el puerto estándar
-        clientPort: 443, 
-        host: 'uramosdev.up.railway.app', // Tu dominio de Railway
-        protocol: 'wss',
-      },
-      // Asegúrate de que el servidor escuche en 0.0.0.0
-    host: true,
-    port: parseInt(process.env.PORT || '5173'),
+    // vite.config.ts
+  server: {
+    host: '0.0.0.0', // Permite que Railway vea el servidor interno
+    port: Number(process.env.PORT) || 5173,
+    strictPort: true,
+    // AQUÍ ESTÁ LA SOLUCIÓN AL ERROR DE "BLOCKED REQUEST"
+    allowedHosts: [
+      'uramosdev.up.railway.app',
+      '.railway.app' // Esto permite cualquier subdominio de railway
+    ],
+    hmr: {
+      host: 'uramosdev.up.railway.app',
+      clientPort: 443,
+      protocol: 'wss',
+    },
   },
-
   };
 });
+
