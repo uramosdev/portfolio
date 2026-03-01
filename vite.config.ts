@@ -21,6 +21,11 @@ export default defineConfig(({mode}) => {
     host: '0.0.0.0', // Esto permite conexiones externas
     port: Number(process.env.PORT) || 5173,
     strictPort: true, // Evita que Vite intente usar otro puerto si este falla
-  },
+  },hmr: {
+      // Aquí SI va tu dominio para que el navegador sepa a dónde reconectar
+      host: 'uramosdev.up.railway.app', 
+      clientPort: 443,
+      protocol: 'wss',
+    },
 };
 });
